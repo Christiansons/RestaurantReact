@@ -2,13 +2,14 @@ import { useState, useEffect } from "react"
 import DatePicker from "react-datepicker"
 import 'react-datepicker/dist/react-datepicker.css'
 import ChooseTime from "./ChooseTime";
+import CreateReservation from "./CreateReservation"
 //import bootstrap
 
 export default function Reservation() {
     const [selectedDate, setSelectedDate] = useState(null);
     const [numberOfGuests, setNumberOfGuests] = useState(null);
     const [canRenderChooseTime, setCanRenderChooseTime] = useState(false);
-    const [selectedDateAndTime, setSelectedDateAndTime] = useState([null])
+    const [selectedDateAndTime, setSelectedDateAndTime] = useState(null);
 
     //Checks to see if a date is selected and number of guests are selected before  calling rendering timeslots.
     function checkRequirments(){
@@ -23,6 +24,12 @@ export default function Reservation() {
     function renderTimeSlots(){
         if(canRenderChooseTime){
             return <ChooseTime selectedDate={selectedDate} numberOfGuests={numberOfGuests} sendDataToReservation={handleDataFromChooseTime}/>
+        }
+    }
+
+    function renderCreateReservation(){
+        if(selectedDateAndTime !== null){
+            return <CreateReservation />
         }
     }
 
@@ -60,6 +67,7 @@ export default function Reservation() {
                 </div>
                 <p>{selectedDateAndTime}</p>
                 {renderTimeSlots()}
+                {renderCreateReservation()}
             </div>
         </>
     )

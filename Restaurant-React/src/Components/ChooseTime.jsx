@@ -59,3 +59,7 @@ export default function ChooseTime({selectedDate, numberOfGuests, sendDataToRese
         </div>
     )
 }
+
+
+//TILL ALEX IMORGON
+//Skapa create RES component, ändra så man inte behöver bord-nummer i API, måste skapa en Customer, ta emot ID, spara och skicka med till create
