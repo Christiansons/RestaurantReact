@@ -3,16 +3,22 @@ import DatePicker from "react-datepicker"
 import 'react-datepicker/dist/react-datepicker.css'
 import ChooseTime from "./ChooseTime";
 import CreateReservation from "./CreateReservation"
+import { useNavigate } from "react-router-dom";
 //import bootstrap
 
 export default function Reservation() {
     const [selectedDate, setSelectedDate] = useState(null);
     const [numberOfGuests, setNumberOfGuests] = useState(null);
     const [canRenderChooseTime, setCanRenderChooseTime] = useState(false);
+    const [canRenderCreateReservation, setCanRenderCreateReservation] = useState(false);
     const [selectedDateAndTime, setSelectedDateAndTime] = useState(null);
+    const [customerId, setCustomerId] = useState(null);
+    const [reservationNumber, setReservationNumber] = useState(null);
+    const [canRouteToConfirmation, setCanRouteToConfirmation] = useState(false);
 
+    const navigate = useNavigate();
     //Checks to see if a date is selected and number of guests are selected before  calling rendering timeslots.
-    function checkRequirments(){
+    function checkTimeSlotRequirments(){
         if(!selectedDate || !numberOfGuests){
             alert('Please select a date and number of guests.');
             return;
@@ -20,24 +26,49 @@ export default function Reservation() {
         setCanRenderChooseTime(true)
     }
 
-    //Renders the time-slot window for a specific day if checkRequirments is met
+    //Checks to see if a time slot is selected and number of guests are sent with it from the TimeSlots component
+    /* useEffect(() => {
+        if(selectedDateAndTime && canRenderCreateReservation){
+            setCanRenderCreateReservation(true)
+        }
+        
+    },[selectedDateAndTime, selectedNumberOfGuests, selectionsChooseTimeSubmit]) */
+
+    //Renders the time-slot window for a specific day if requirments from checkTimeSlotRequirments is met
     function renderTimeSlots(){
         if(canRenderChooseTime){
             return <ChooseTime selectedDate={selectedDate} numberOfGuests={numberOfGuests} sendDataToReservation={handleDataFromChooseTime}/>
         }
     }
 
+    //Renders the Create reservation window if requirements from useeffect is met
     function renderCreateReservation(){
-        if(selectedDateAndTime !== null){
-            return <CreateReservation />
+        if(canRenderCreateReservation){
+            return <CreateReservation selectedDateAndTime={selectedDateAndTime} numberOfGuests={numberOfGuests} sendDataToReservation={handleDataFromCreateReservation}/>
         }
     }
 
-    //Gets the chosen date from the choose-time component
-    const handleDataFromChooseTime = (dateAndTime) => {
+    function routeToBookingConfirmed(){
+        if(canRouteToConfirmation)
+        navigate('/booking-confirmed', { state: { customerId, reservationNumber } });
+
+    }
+
+    //Gets the data from the choose-time component
+    const handleDataFromChooseTime = (dateAndTime, guests) => {
         setSelectedDateAndTime(dateAndTime);
+        setNumberOfGuests(guests);
+        setCanRenderCreateReservation(true);
     };
 
+    //Gets the data from CreateReservation component
+    const handleDataFromCreateReservation = (customerId, reservationNumber) => {
+        setCustomerId(customerId)
+        setReservationNumber(reservationNumber)
+        setCanRouteToConfirmation(true)
+        alert(`${customerId}, ${reservationNumber}`)
+    }
+    
     return (
         <>
             <h1>Create booking:</h1>
@@ -61,13 +92,15 @@ export default function Reservation() {
                         required/>
                 </div>
                 <div>
-                    <button className="btn btn-info mt-3" onClick={checkRequirments}>
+                    <button className="btn btn-info mt-3" onClick={checkTimeSlotRequirments}>
                         Show Available Time Slots
                     </button>
                 </div>
-                <p>{selectedDateAndTime}</p>
                 {renderTimeSlots()}
+                
                 {renderCreateReservation()}
+                
+                {routeToBookingConfirmed()}
             </div>
         </>
     )
@@ -78,3 +111,6 @@ export default function Reservation() {
 //Välja hur många 
 //Visa alla lediga tider - 12-24
 //show only times, not the tables,
+
+
+//use-effect for numer of guests and date to skip show available times
